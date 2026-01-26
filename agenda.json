@@ -1,0 +1,12 @@
+[
+    {
+        "Nombre": "Juan",
+        "Teléfono": 123456789,
+        "Correo": "juan@gmail.com",
+        "Cumpleaños": [
+            5,
+            5,
+            2000
+        ]
+    }
+]
