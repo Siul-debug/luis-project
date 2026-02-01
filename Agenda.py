@@ -9,191 +9,159 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# ---------------- JSON ----------------
 ARCHIVO_JSON = "agenda.json"
 
-def cargar_agenda():
-    if os.path.exists(ARCHIVO_JSON):
-        with open(ARCHIVO_JSON, "r", encoding="utf-8") as archivo:
-            try:
-                logging.info("Agenda cargada desde archivo JSON")
-                return json.load(archivo)
-            except json.JSONDecodeError:
-                logging.error("Error al leer el archivo JSON")
-                return []
-    return []
 
-def guardar_agenda(agenda):
-    with open(ARCHIVO_JSON, "w", encoding="utf-8") as archivo:
-        json.dump(agenda, archivo, indent=4, ensure_ascii=False)
-    logging.info("Agenda guardada en archivo JSON")
+# ---------------- CLASE BASE ----------------
+class Persona:
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+
+# ---------------- HERENCIA ----------------
+class Contacto(Persona):
+    def __init__(self, nombre, telefono, correo, cumpleaños):
+        super().__init__(nombre)
+        self.telefono = telefono
+        self.correo = correo
+        self.cumpleaños = cumpleaños
+
+    def to_dict(self):
+        """Convierte el objeto a diccionario para JSON"""
+        return {
+            "Nombre": self.nombre,
+            "Teléfono": self.telefono,
+            "Correo": self.correo,
+            "Cumpleaños": self.cumpleaños
+        }
+
 
 # ---------------- AGENDA ----------------
-agenda = cargar_agenda()
+class Agenda:
+    def __init__(self):
+        self.contactos = self.cargar_agenda()
 
-# ---------------- FUNCIONES ----------------
-def insertar_elementos(agenda):
-    print("\n--- Insertar nuevo contacto ---")
+    def cargar_agenda(self):
+        if os.path.exists(ARCHIVO_JSON):
+            try:
+                with open(ARCHIVO_JSON, "r", encoding="utf-8") as archivo:
+                    logging.info("Agenda cargada desde JSON")
+                    return json.load(archivo)
+            except json.JSONDecodeError:
+                logging.error("Error al leer JSON")
+        return []
 
-    nombre = input("Nombre: ")
-    correo = input("Correo electrónico: ")
+    def guardar_agenda(self):
+        with open(ARCHIVO_JSON, "w", encoding="utf-8") as archivo:
+            json.dump(self.contactos, archivo, indent=4, ensure_ascii=False)
+        logging.info("Agenda guardada")
 
-    try:
-        tlf = int(input("Número de teléfono: "))
-    except:
-        print("Error: el teléfono debe ser un número.")
-        logging.error("Teléfono inválido al insertar contacto")
-        return agenda
+    def agregar_contacto(self, contacto: Contacto):
+        self.contactos.append(contacto.to_dict())
+        self.guardar_agenda()
+        logging.info(f"Contacto agregado: {contacto.nombre}")
 
-    cumpleaños = input("Cumpleaños (DD/MM/AAAA): ")
-    try:
-        dia, mes, año = map(int, cumpleaños.split("/"))
-    except:
-        print("Error: el cumpleaños debe tener el formato DD/MM/AAAA.")
-        logging.error("Formato de cumpleaños inválido")
-        return agenda
+    def buscar_contacto(self, nombre):
+        for contacto in self.contactos:
+            if contacto["Nombre"].lower() == nombre.lower():
+                return contacto
+        return None
 
-    if nombre == "" or correo == "":
-        print("Debe rellenar todos los campos.")
-        logging.warning("Intento de insertar contacto con campos vacíos")
-        return agenda
+    def eliminar_contacto(self, nombre):
+        contacto = self.buscar_contacto(nombre)
+        if contacto:
+            self.contactos.remove(contacto)
+            self.guardar_agenda()
+            logging.info(f"Contacto eliminado: {nombre}")
+            return True
+        return False
 
-    contacto = {
-        "Nombre": nombre,
-        "Teléfono": tlf,
-        "Correo": correo,
-        "Cumpleaños": [dia, mes, año]
-    }
+    def mostrar_contactos(self):
+        if not self.contactos:
+            print("La agenda está vacía.")
+            return
 
-    agenda.append(contacto)
-    logging.info(f"Contacto agregado: {nombre}")
-    print("Contacto agregado correctamente.")
-    return agenda
+        for i, c in enumerate(self.contactos, start=1):
+            print(f"\nContacto {i}")
+            print("Nombre:", c["Nombre"])
+            print("Teléfono:", c["Teléfono"])
+            print("Correo:", c["Correo"])
+            d, m, a = c["Cumpleaños"]
+            print(f"Cumpleaños: {d:02d}/{m:02d}/{a}")
 
 
-def buscar_elementos(agenda):
-    nombre_buscar = input("Ingrese el nombre del contacto a buscar: ")
+# ---------------- APLICACIÓN ----------------
+class AgendaApp:
+    def __init__(self):
+        self.agenda = Agenda()
 
-    for contacto in agenda:
-        if contacto["Nombre"].lower() == nombre_buscar.lower():
+    def insertar_contacto(self):
+        print("\n--- Nuevo contacto ---")
+        nombre = input("Nombre: ")
+        correo = input("Correo: ")
+
+        try:
+            telefono = int(input("Teléfono: "))
+        except ValueError:
+            print("Teléfono inválido")
+            return
+
+        try:
+            dia, mes, año = map(int, input("Cumpleaños (DD/MM/AAAA): ").split("/"))
+        except ValueError:
+            print("Formato de fecha inválido")
+            return
+
+        contacto = Contacto(nombre, telefono, correo, [dia, mes, año])
+        self.agenda.agregar_contacto(contacto)
+        print("Contacto agregado correctamente")
+
+    def buscar_contacto(self):
+        nombre = input("Nombre a buscar: ")
+        contacto = self.agenda.buscar_contacto(nombre)
+
+        if contacto:
             print("\n--- Contacto encontrado ---")
             print("Nombre:", contacto["Nombre"])
             print("Teléfono:", contacto["Teléfono"])
             print("Correo:", contacto["Correo"])
+        else:
+            print("Contacto no encontrado")
 
-            cumple = contacto["Cumpleaños"]
-            print(f"Cumpleaños: {cumple[0]:02d}/{cumple[1]:02d}/{cumple[2]}")
+    def eliminar_contacto(self):
+        nombre = input("Nombre a eliminar: ")
+        if self.agenda.eliminar_contacto(nombre):
+            print("Contacto eliminado")
+        else:
+            print("Contacto no encontrado")
 
-            logging.info(f"Contacto encontrado: {contacto['Nombre']}")
-            return agenda
+    def menu(self):
+        while True:
+            print("\n--- MENÚ ---")
+            print("1. Insertar contacto")
+            print("2. Buscar contacto")
+            print("3. Eliminar contacto")
+            print("4. Mostrar contactos")
+            print("5. Salir")
 
-    print("No se encontró el contacto.")
-    logging.warning(f"Contacto no encontrado: {nombre_buscar}")
-    return agenda
+            opcion = input("Opción: ")
 
-
-def modificar_elementos(agenda):
-    nombre_modificar = input("Ingrese el nombre del contacto a modificar: ")
-
-    for contacto in agenda:
-        if contacto["Nombre"].lower() == nombre_modificar.lower():
-            print("\nDatos actuales:")
-            print("Teléfono:", contacto["Teléfono"])
-            print("Correo:", contacto["Correo"])
-            print("Cumpleaños:", contacto["Cumpleaños"])
-
-            tlf = input("Nuevo número de teléfono (dejar vacío para no cambiar): ")
-            if tlf:
-                try:
-                    contacto["Teléfono"] = int(tlf)
-                except:
-                    print("Error: El teléfono debe ser un número.")
-                    logging.error("Teléfono inválido al modificar contacto")
-
-            correo = input("Nuevo correo electrónico (dejar vacío para no cambiar): ")
-            if correo:
-                contacto["Correo"] = correo
-
-            cumpleaños = input("Nuevo cumpleaños (DD/MM/AAAA) (dejar vacío para no cambiar): ")
-            if cumpleaños:
-                try:
-                    dia, mes, año = map(int, cumpleaños.split("/"))
-                    contacto["Cumpleaños"] = [dia, mes, año]
-                except:
-                    print("Error: El cumpleaños debe tener el formato DD/MM/AAAA.")
-                    logging.error("Cumpleaños inválido al modificar contacto")
-
-            logging.info(f"Contacto modificado: {contacto['Nombre']}")
-            print("Contacto actualizado.")
-            return agenda
-
-    print("No se encontró el contacto.")
-    logging.warning(f"Intento de modificar contacto inexistente: {nombre_modificar}")
-    return agenda
+            if opcion == "1":
+                self.insertar_contacto()
+            elif opcion == "2":
+                self.buscar_contacto()
+            elif opcion == "3":
+                self.eliminar_contacto()
+            elif opcion == "4":
+                self.agenda.mostrar_contactos()
+            elif opcion == "5":
+                print("Saliendo...")
+                break
+            else:
+                print("Opción inválida")
 
 
-def eliminar_elementos(agenda):
-    nombre_eliminar = input("Ingrese el nombre del contacto a eliminar: ")
-
-    for contacto in agenda:
-        if contacto["Nombre"].lower() == nombre_eliminar.lower():
-            agenda.remove(contacto)
-            logging.info(f"Contacto eliminado: {nombre_eliminar}")
-            print(f"Contacto {nombre_eliminar} eliminado correctamente.")
-            return agenda
-
-    print("No se encontró el contacto a eliminar.")
-    logging.warning(f"Intento de eliminar contacto inexistente: {nombre_eliminar}")
-    return agenda
-
-
-def mostrar_todos(agenda):
-    print("\n--- Lista de contactos ---")
-
-    if not agenda:
-        print("La agenda está vacía.")
-        return agenda
-
-    for i, contacto in enumerate(agenda, start=1):
-        print(f"\nContacto {i}")
-        print("Nombre:", contacto["Nombre"])
-        print("Teléfono:", contacto["Teléfono"])
-        print("Correo:", contacto["Correo"])
-        cumple = contacto["Cumpleaños"]
-        print(f"Cumpleaños: {cumple[0]:02d}/{cumple[1]:02d}/{cumple[2]}")
-
-    logging.info("Mostrados todos los contactos")
-    return agenda
-
-# ---------------- MENÚ ----------------
-while True:
-    print("\n--- Menú ---")
-    print("1. Insertar nuevo contacto")
-    print("2. Buscar contacto")
-    print("3. Modificar contacto")
-    print("4. Eliminar contacto")
-    print("5. Mostrar todos los contactos")
-    print("6. Salir")
-
-    opcion = input("Elige una opción: ")
-
-    if opcion == "1":
-        agenda = insertar_elementos(agenda)
-        guardar_agenda(agenda)
-    elif opcion == "2":
-        agenda = buscar_elementos(agenda)
-    elif opcion == "3":
-        agenda = modificar_elementos(agenda)
-        guardar_agenda(agenda)
-    elif opcion == "4":
-        agenda = eliminar_elementos(agenda)
-        guardar_agenda(agenda)
-    elif opcion == "5":
-        agenda = mostrar_todos(agenda)
-    elif opcion == "6":
-        print("Saliendo...")
-        logging.info("Aplicación cerrada por el usuario")
-        break
-    else:
-        print("Opción no válida. Intenta de nuevo.")
-        logging.warning("Opción de menú inválida")
+# ---------------- EJECUCIÓN ----------------
+if __name__ == "__main__":
+    app = AgendaApp()
+    app.menu()
