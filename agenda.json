@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "tipo": "especial",
+        "nombre": "Ana",
+        "telefono": 678912345,
+        "correo": "ana@gmail.com",
+        "cumpleaños": [
+            15,
+            8,
+            1980
+        ],
+        "alias": "Anita"
+    }
+]

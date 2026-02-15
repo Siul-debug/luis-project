@@ -8,3 +8,65 @@
 2026-02-01 15:28:59,806 - INFO - Agenda cargada desde JSON
 2026-02-01 15:29:26,111 - INFO - Agenda guardada
 2026-02-01 15:29:26,111 - INFO - Contacto eliminado: Juan
+2026-02-02 19:44:10,342 - INFO - Agenda cargada desde JSON
+2026-02-02 19:53:04,369 - ERROR - Contacto no encontrado
+2026-02-02 19:53:04,369 - INFO - Agenda cargada desde JSON
+2026-02-02 19:53:30,145 - INFO - Agenda guardada
+2026-02-02 19:53:30,145 - INFO - Contacto agregado: Pepe
+2026-02-02 19:59:16,242 - INFO - Contacto no encontrado
+2026-02-02 19:59:16,242 - INFO - Agenda cargada desde JSON
+2026-02-02 20:00:12,956 - INFO - Contacto no encontrado
+2026-02-02 20:00:12,956 - INFO - Agenda cargada desde JSON
+2026-02-02 20:03:44,561 - INFO - Contacto no encontrado
+2026-02-02 20:03:44,562 - INFO - Agenda cargada desde JSON
+2026-02-02 20:04:12,047 - INFO - Contacto no encontrado
+2026-02-02 20:04:12,047 - INFO - Agenda cargada desde JSON
+2026-02-02 20:05:10,132 - INFO - Contacto no encontrado
+2026-02-02 20:05:10,132 - INFO - Agenda cargada desde JSON
+2026-02-02 20:08:20,358 - INFO - Contacto no encontrado
+2026-02-02 20:08:20,358 - INFO - Agenda cargada desde JSON
+2026-02-02 20:09:06,890 - INFO - Contacto no encontrado
+2026-02-02 20:09:06,890 - INFO - Agenda cargada desde JSON
+2026-02-02 20:22:00,701 - INFO - Contacto no encontrado
+2026-02-02 20:22:00,701 - INFO - Agenda cargada desde JSON
+2026-02-02 20:22:35,126 - INFO - Agenda guardada
+2026-02-02 20:22:35,127 - INFO - Contacto agregado: Luis
+2026-02-02 20:23:08,586 - INFO - Agenda guardada
+2026-02-02 20:23:08,586 - INFO - Contacto agregado: Ramón
+2026-02-02 20:25:09,841 - INFO - Contacto no encontrado
+2026-02-02 20:25:09,841 - INFO - Agenda cargada desde JSON
+2026-02-02 20:29:10,100 - INFO - Contacto no encontrado
+2026-02-02 20:29:10,100 - INFO - Agenda cargada desde JSON
+2026-02-02 20:29:27,183 - INFO - Contacto no encontrado
+2026-02-02 20:29:27,183 - INFO - Agenda cargada desde JSON
+2026-02-02 20:30:21,501 - INFO - Contacto no encontrado
+2026-02-02 20:30:21,501 - INFO - Agenda cargada desde JSON
+2026-02-02 20:30:50,692 - INFO - Contacto no encontrado
+2026-02-02 20:30:50,692 - INFO - Agenda cargada desde JSON
+2026-02-02 20:30:57,536 - INFO - Contacto no encontrado
+2026-02-02 20:30:57,536 - INFO - Agenda cargada desde JSON
+2026-02-02 20:36:28,838 - INFO - Contacto no encontrado
+2026-02-02 20:36:28,839 - INFO - Agenda cargada desde JSON
+2026-02-02 20:37:44,059 - INFO - Contacto no encontrado
+2026-02-02 20:37:44,059 - INFO - Agenda cargada desde JSON
+2026-02-02 20:38:30,080 - INFO - Contacto no encontrado
+2026-02-02 20:38:30,080 - INFO - Agenda cargada desde JSON
+2026-02-02 20:39:35,168 - INFO - Contacto no encontrado
+2026-02-02 20:39:35,168 - INFO - Agenda cargada desde JSON
+2026-02-02 20:46:35,648 - INFO - Contacto no encontrado
+2026-02-02 20:46:35,648 - INFO - Agenda cargada desde JSON
+2026-02-02 20:47:30,887 - INFO - Contacto no encontrado
+2026-02-02 20:47:30,887 - INFO - Agenda cargada desde JSON
+2026-02-15 13:25:04,442 - INFO - Contacto no encontrado
+2026-02-15 13:25:04,467 - INFO - Agenda cargada desde JSON
+2026-02-15 13:25:22,279 - INFO - Agenda guardada
+2026-02-15 13:25:22,279 - INFO - Contacto agregado: Jose
+2026-02-15 13:27:34,170 - ERROR - Error cargando agenda
+2026-02-15 13:29:54,678 - ERROR - Error cargando agenda
+2026-02-15 13:30:23,054 - INFO - Agenda guardada
+2026-02-15 13:30:23,054 - INFO - Contacto agregado: Jose
+2026-02-15 13:31:39,779 - INFO - Agenda guardada
+2026-02-15 13:31:39,779 - INFO - Contacto agregado: Ana
+2026-02-15 13:31:59,873 - INFO - Agenda guardada
+2026-02-15 13:31:59,875 - INFO - Contacto eliminado: Jose
+2026-02-15 13:32:08,588 - INFO - Agenda cargada
