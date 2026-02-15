@@ -2,7 +2,11 @@ import json
 import os
 import logging
 
-# ---------------- CONFIGURACIÓN LOGGING ----------------
+
+# =====================================================
+# CONFIGURACIÓN LOGGING
+# =====================================================
+
 logging.basicConfig(
     filename="agenda.log",
     level=logging.INFO,
@@ -12,156 +16,385 @@ logging.basicConfig(
 ARCHIVO_JSON = "agenda.json"
 
 
-# ---------------- CLASE BASE ----------------
-class Persona:
-    def __init__(self, nombre):
-        self.nombre = nombre
+# =====================================================
+# CLASE BASE
+# =====================================================
 
+class Contacto:
 
-# ---------------- HERENCIA ----------------
-class Contacto(Persona):
     def __init__(self, nombre, telefono, correo, cumpleaños):
-        super().__init__(nombre)
+
+        self.nombre = nombre
         self.telefono = telefono
         self.correo = correo
         self.cumpleaños = cumpleaños
 
+
+    def mostrar(self):
+
+        d, m, a = self.cumpleaños
+
+        print("Nombre:", self.nombre)
+        print("Teléfono:", self.telefono)
+        print("Correo:", self.correo)
+        print(f"Cumpleaños: {d:02d}/{m:02d}/{a}")
+
+
     def to_dict(self):
-        """Convierte el objeto a diccionario para JSON"""
+
         return {
-            "Nombre": self.nombre,
-            "Teléfono": self.telefono,
-            "Correo": self.correo,
-            "Cumpleaños": self.cumpleaños
+
+            "tipo": "normal",
+
+            "nombre": self.nombre,
+            "telefono": self.telefono,
+            "correo": self.correo,
+            "cumpleaños": self.cumpleaños
         }
 
 
-# ---------------- AGENDA ----------------
+    @staticmethod
+    def from_dict(data):
+
+        if data["tipo"] == "especial":
+
+            return ContactoEspecial(
+                data["nombre"],
+                data["telefono"],
+                data["correo"],
+                data["cumpleaños"],
+                data["alias"]
+            )
+
+        return Contacto(
+            data["nombre"],
+            data["telefono"],
+            data["correo"],
+            data["cumpleaños"]
+        )
+
+
+# =====================================================
+# SUBCLASE
+# =====================================================
+
+class ContactoEspecial(Contacto):
+
+    def __init__(self, nombre, telefono, correo, cumpleaños, alias):
+
+        super().__init__(nombre, telefono, correo, cumpleaños)
+
+        self.alias = alias
+
+
+    def mostrar(self):
+
+        super().mostrar()
+
+        print("Alias:", self.alias)
+
+
+    def to_dict(self):
+
+        data = super().to_dict()
+
+        data["tipo"] = "especial"
+
+        data["alias"] = self.alias
+
+        return data
+
+
+# =====================================================
+# AGENDA
+# =====================================================
+
 class Agenda:
+
     def __init__(self):
+
         self.contactos = self.cargar_agenda()
 
+
     def cargar_agenda(self):
+
+        contactos = []
+
         if os.path.exists(ARCHIVO_JSON):
+
             try:
+
                 with open(ARCHIVO_JSON, "r", encoding="utf-8") as archivo:
-                    logging.info("Agenda cargada desde JSON")
-                    return json.load(archivo)
-            except json.JSONDecodeError:
-                logging.error("Error al leer JSON")
-        return []
+
+                    datos = json.load(archivo)
+
+                    for d in datos:
+
+                        contactos.append(Contacto.from_dict(d))
+
+                logging.info("Agenda cargada")
+
+            except:
+
+                logging.error("Error cargando agenda")
+
+        return contactos
+
 
     def guardar_agenda(self):
+
+        datos = [c.to_dict() for c in self.contactos]
+
         with open(ARCHIVO_JSON, "w", encoding="utf-8") as archivo:
-            json.dump(self.contactos, archivo, indent=4, ensure_ascii=False)
+
+            json.dump(datos, archivo, indent=4, ensure_ascii=False)
+
         logging.info("Agenda guardada")
 
-    def agregar_contacto(self, contacto: Contacto):
-        self.contactos.append(contacto.to_dict())
+
+    def agregar_contacto(self, contacto):
+
+        self.contactos.append(contacto)
+
         self.guardar_agenda()
+
         logging.info(f"Contacto agregado: {contacto.nombre}")
 
+
     def buscar_contacto(self, nombre):
-        for contacto in self.contactos:
-            if contacto["Nombre"].lower() == nombre.lower():
-                return contacto
+
+        for c in self.contactos:
+
+            if c.nombre.lower() == nombre.lower():
+
+                return c
+
         return None
 
+
     def eliminar_contacto(self, nombre):
+
         contacto = self.buscar_contacto(nombre)
+
         if contacto:
+
             self.contactos.remove(contacto)
+
             self.guardar_agenda()
+
             logging.info(f"Contacto eliminado: {nombre}")
+
             return True
+
         return False
 
+
     def mostrar_contactos(self):
+
         if not self.contactos:
-            print("La agenda está vacía.")
+
+            print("Agenda vacía")
+
             return
 
-        for i, c in enumerate(self.contactos, start=1):
-            print(f"\nContacto {i}")
-            print("Nombre:", c["Nombre"])
-            print("Teléfono:", c["Teléfono"])
-            print("Correo:", c["Correo"])
-            d, m, a = c["Cumpleaños"]
-            print(f"Cumpleaños: {d:02d}/{m:02d}/{a}")
+        for i, c in enumerate(self.contactos, 1):
+
+            print("\n------------------")
+
+            print(f"Contacto {i}")
+
+            print("------------------")
+
+            c.mostrar()
 
 
-# ---------------- APLICACIÓN ----------------
+# =====================================================
+# APP
+# =====================================================
+
 class AgendaApp:
+
     def __init__(self):
+
         self.agenda = Agenda()
 
+
+    # INSERTAR
+
     def insertar_contacto(self):
-        print("\n--- Nuevo contacto ---")
+
+        print("\n==============================")
+        print("     NUEVO CONTACTO")
+        print("==============================")
+
+        print("1. Contacto normal")
+        print("2. Contacto especial")
+
+        tipo = input("\nSeleccione tipo: ")
+
+
         nombre = input("Nombre: ")
+
         correo = input("Correo: ")
 
+
         try:
+
             telefono = int(input("Teléfono: "))
+
         except ValueError:
+
             print("Teléfono inválido")
+
             return
+
 
         try:
-            dia, mes, año = map(int, input("Cumpleaños (DD/MM/AAAA): ").split("/"))
+
+            dia, mes, año = map(
+                int,
+                input("Cumpleaños (DD/MM/AAAA): ").split("/")
+            )
+
         except ValueError:
-            print("Formato de fecha inválido")
+
+            print("Fecha inválida")
+
             return
 
-        contacto = Contacto(nombre, telefono, correo, [dia, mes, año])
+
+        if tipo == "2":
+
+            alias = input("Alias: ")
+
+            contacto = ContactoEspecial(
+                nombre,
+                telefono,
+                correo,
+                [dia, mes, año],
+                alias
+            )
+
+        else:
+
+            contacto = Contacto(
+                nombre,
+                telefono,
+                correo,
+                [dia, mes, año]
+            )
+
+
         self.agenda.agregar_contacto(contacto)
-        print("Contacto agregado correctamente")
+
+        print("\n✅ Contacto agregado correctamente")
+
+
+    # BUSCAR
 
     def buscar_contacto(self):
-        nombre = input("Nombre a buscar: ")
+
+        print("\n==============================")
+        print("     BUSCAR CONTACTO")
+        print("==============================")
+
+        nombre = input("Nombre: ")
+
         contacto = self.agenda.buscar_contacto(nombre)
 
         if contacto:
-            print("\n--- Contacto encontrado ---")
-            print("Nombre:", contacto["Nombre"])
-            print("Teléfono:", contacto["Teléfono"])
-            print("Correo:", contacto["Correo"])
+
+            print("\nContacto encontrado:\n")
+
+            contacto.mostrar()
+
         else:
-            print("Contacto no encontrado")
+
+            print("\n❌ Contacto no encontrado")
+
+
+    # ELIMINAR
 
     def eliminar_contacto(self):
-        nombre = input("Nombre a eliminar: ")
+
+        print("\n==============================")
+        print("    ELIMINAR CONTACTO")
+        print("==============================")
+
+        nombre = input("Nombre: ")
+
         if self.agenda.eliminar_contacto(nombre):
-            print("Contacto eliminado")
+
+            print("\n✅ Contacto eliminado")
+
         else:
-            print("Contacto no encontrado")
+
+            print("\n❌ Contacto no encontrado")
+
+
+    # MOSTRAR
+
+    def mostrar_contactos(self):
+
+        print("\n==============================")
+        print("     LISTA DE CONTACTOS")
+        print("==============================")
+
+        self.agenda.mostrar_contactos()
+
+
+    # MENU
 
     def menu(self):
+
         while True:
-            print("\n--- MENÚ ---")
+
+            print("\n=================================")
+            print("         AGENDA PERSONAL")
+            print("=================================")
+
             print("1. Insertar contacto")
             print("2. Buscar contacto")
             print("3. Eliminar contacto")
             print("4. Mostrar contactos")
             print("5. Salir")
 
-            opcion = input("Opción: ")
+            opcion = input("\nSeleccione una opción: ")
+
 
             if opcion == "1":
+
                 self.insertar_contacto()
+
             elif opcion == "2":
+
                 self.buscar_contacto()
+
             elif opcion == "3":
+
                 self.eliminar_contacto()
+
             elif opcion == "4":
-                self.agenda.mostrar_contactos()
+
+                self.mostrar_contactos()
+
             elif opcion == "5":
-                print("Saliendo...")
+
+                print("\n👋 Cerrando agenda...")
+
                 break
+
             else:
-                print("Opción inválida")
+
+                print("\n❌ Opción inválida")
 
 
-# ---------------- EJECUCIÓN ----------------
+# =====================================================
+# MAIN
+# =====================================================
+
 if __name__ == "__main__":
+
     app = AgendaApp()
+
     app.menu()
